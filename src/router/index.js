@@ -5,6 +5,8 @@ const Recommend = () => import('../views/Recommend')
 const Singer = () => import('../views/Singer')
 const Rank = () => import('../views/Rank')
 const Search = () => import('../views/Search')
+const Detail = () => import('../views/Detail')
+const Player = () => import('../views/Player')
 
 Vue.use(VueRouter)
 
@@ -12,7 +14,10 @@ const routes = [
   { path: '/', redirect: '/recommend' },
   {
     path: '/recommend',
-    component: Recommend
+    component: Recommend,
+    children: [
+      { path: 'detail/:id/:type', component: Detail }
+    ]
   },
   {
     path: '/singer',
@@ -25,6 +30,10 @@ const routes = [
   {
     path: '/search',
     component: Search
+  },
+  {
+    path: '/player',
+    component: Player
   }
 ]
 
