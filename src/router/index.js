@@ -1,12 +1,15 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+// 推荐
+const Recommend = () => import('../views/recommend/Recommend')
+// 歌手
+const Singer = () => import('../views/singer/Singer')
+// 排行
+const Rank = () => import('../views/rank/Rank')
+// 搜索
+const Search = () => import('../views/search/Search')
 
-const Recommend = () => import('../views/Recommend')
-const Singer = () => import('../views/Singer')
-const Rank = () => import('../views/Rank')
-const Search = () => import('../views/Search')
-const Detail = () => import('../views/Detail')
-const Player = () => import('../views/Player')
+const Detail = () => import('../views/detail/Detail')
 
 Vue.use(VueRouter)
 
@@ -16,7 +19,10 @@ const routes = [
     path: '/recommend',
     component: Recommend,
     children: [
-      { path: 'detail/:id/:type', component: Detail }
+      {
+        path: 'detail/:id/:type',
+        component: Detail
+      }
     ]
   },
   {
@@ -30,11 +36,8 @@ const routes = [
   {
     path: '/search',
     component: Search
-  },
-  {
-    path: '/player',
-    component: Player
   }
+
 ]
 
 const router = new VueRouter({

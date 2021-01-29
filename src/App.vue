@@ -1,36 +1,30 @@
 <template>
   <div id="app">
     <Header></Header>
-    <Tabbar></Tabbar>
+    <TabBar></TabBar>
     <router-view></router-view>
+    <!-- 播放界面-->
     <Player></Player>
-
   </div>
 </template>
 
 <script>
-import Header from 'components/Header'
-import Tabbar from 'components/Tabbar'
-import Player from 'views/Player'
-
+import Header from '@/components/Header'
+import TabBar from '@/components/TabBar'
+import Player from '@/views/player/Player'
 export default {
   name: 'App',
   components: {
     Header,
-    Tabbar,
+    TabBar,
     Player
-
   },
-  methods: {
-
-  },
-  created () {
-
-  }
+  methods: {},
+  created () {}
 }
-
 </script>
-<style lang="scss">
-@import "./assets/css/variable.scss";
-
+<style lang="scss" scoped>
+#app{
+  overflow: hidden;
+}
 </style>

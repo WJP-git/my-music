@@ -1,11 +1,9 @@
 <template>
-<div class="header" @click="changeTheme">
-  <div class="header-left">
+  <div class="header" @click.stop="headerClick">
+    <div class="left"></div>
+    <div class="center">music</div>
+    <div class="right"></div>
   </div>
-  <div class="header-title">music</div>
-  <div class="header-right"></div>
-
-</div>
 </template>
 
 <script>
@@ -18,44 +16,43 @@ export default {
     }
   },
   methods: {
-    changeTheme () {
+    headerClick () {
       this.index++
       if (this.index >= this.theme.length) {
         this.index = 0
       }
       document.documentElement.setAttribute('data-theme', this.theme[this.index])
     }
-
   }
 }
 </script>
 
-<style lang="scss" scoped>
-@import '../assets/css/variable.scss';
-@import "../assets/css/mixin.scss";
-.header{
-  @include bg_color();
-  width: 100%;
-  height: 100px;
-  display: flex;
-  justify-content: space-between;
-  .header-left,.header-right{
-    width: 84px;
-    height: 84px;
-    margin-top: 8px;
-  }
-  .header-title{
+<style scoped lang="scss">
+@import "../assets/css/mixin";
+//@import "../assets/css/variable";
+  .header {
+    width: 100%;
     line-height: 100px;
-    font-weight: bold;
-    color: #fff;
-    @include font_size($font_large);
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    @include bg_color();
+
+    .left,.right{
+      width: 84px;
+    }
+    .left{
+      @include bg_img('../assets/images/logo')
+    }
+
+    .center {
+      flex: 1;
+      color: #fff;
+      @include font_size($font_medium)
+    }
+    .right{
+      @include bg_img('../assets/images/account')
+    }
   }
-  .header-left{
-    @include bg_img('~assets/images/logo')
-  }
-  .header-right{
-    @include bg_img('~assets/images/account')
-  }
-}
 
 </style>

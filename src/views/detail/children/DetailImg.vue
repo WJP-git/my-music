@@ -1,30 +1,28 @@
 <template>
-<div class="top">
-<div class="img-container">
-  <img :src="path" alt="">
-</div>
-</div>
+  <div class="img">
+    <img :src="url" alt="">
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'DetailTop',
+  name: 'DetailImg',
   props: {
-    path: {
-      type: String,
-      require: true
+    url: {
+      type: String
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.top{
+.img{
   width: 100%;
   height: 500px;
   overflow: hidden;
   img{
     width: 100%;
+
   }
 }
 </style>
