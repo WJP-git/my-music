@@ -2,15 +2,15 @@
   <div class="header">
     <div class="left" @click="hiddenNormalPlayer"></div>
     <div class="center">
-      <h3>www</h3>
-      <div>wjp</div>
+      <h3>{{ currentSong.name }}</h3>
+      <div>{{ currentSong.singer }}</div>
     </div>
     <div class="right"></div>
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'PlayerNavBar',
   props: {
@@ -33,6 +33,11 @@ export default {
       this.setFullScreen(false)
       this.setMiniPlayer(true)
     }
+  },
+  computed: {
+    ...mapGetters([
+      'currentSong'
+    ])
   }
 }
 </script>

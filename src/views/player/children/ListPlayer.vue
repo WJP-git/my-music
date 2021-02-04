@@ -1,30 +1,34 @@
 <template>
-  <div class="list-player" v-show="isShow">
+  <div class="list-player" v-show="isShowListPlayer">
     <div class="player-wrapper">
       <div class="player-top">
         <div class="top-left">
-          <div class="mode"></div>
-          <p>顺序播放</p>
+          <div class="mode loop" @click.stop="mode" ref="mode"></div>
+          <p v-if="modeType === 0">顺序播放</p>
+          <p v-else-if="modeType === 1">单曲播放</p>
+          <p v-else-if="modeType === 2">随机播放</p>
         </div>
-        <div class="top-right">
+        <div class="top-right" @click.stop="delAll">
           <div class="del"></div>
         </div>
       </div>
       <div class="player-middle">
-        <Scroll>
-          <div class="item">
+        <Scroll ref="scroll">
+          <div class="list" ref="playAndPause">
+          <div class="item" v-for="(item,i) in songs" :key="item.id" @click.stop="selectMusic(i)">
             <div class="item-left">
-              <div class="item-play"></div>
-              <div>温济朋</div>
+              <div class="item-play" @click.stop="playAndPause" v-show="currentIndex === i"></div>
+              <div>{{ item.name }}</div>
             </div>
             <div class="item-right">
-              <div class="item-favorite">
+              <div class="item-favorite" @click.stop="favorite(item)" :class="{'active':isFavorite(item)}">
 
               </div>
-              <div class="item-del">
+              <div class="item-del" @click.stop="delItem(i)">
 
               </div>
             </div>
+          </div>
           </div>
         </Scroll>
       </div>
@@ -36,24 +40,112 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+import modeType from '@/store/modeType'
 import Scroll from '@/components/Scroll'
 export default {
   name: 'ListPlayer',
   data () {
     return {
-      isShow: false
     }
   },
   components: {
     Scroll
   },
   methods: {
-    show () {
-      this.isShow = !this.isShow
-    },
+
     // 关闭listPlayer组件
     hidden () {
-      this.isShow = false
+      this.setListPlayer(false)
+    },
+    ...mapActions([
+      // 本组件的显示与隐藏
+      'setListPlayer',
+      // 映射播放图标
+      'setIsPlayIcon',
+      // 播放类型
+      'setModeType',
+      //  删除歌曲
+      'setDelSong',
+      //  当前歌曲索引
+      'setCurrentIndex',
+      // 收藏歌曲
+      'setFavoriteSong'
+    ]),
+    // 播放按钮的播放与暂停
+    playAndPause (id) {
+      this.setIsPlayIcon(!this.isPlayIcon)
+    },
+    mode () {
+      if (this.modeType === modeType.loop) {
+        this.setModeType(modeType.one)
+      } else if (this.modeType === modeType.one) {
+        this.setModeType(modeType.random)
+      } else if (this.modeType === modeType.random) {
+        this.setModeType(modeType.loop)
+      }
+    },
+    //  删除单条歌曲
+    delItem (i) {
+      this.setDelSong(i)
+    },
+    //  删除所有
+    delAll () {
+      this.setDelSong()
+    },
+    selectMusic (i) {
+      this.setCurrentIndex(i)
+    },
+    //  收藏歌曲
+    favorite (val) {
+      this.setFavoriteSong(val)
+    },
+    isFavorite (song) {
+      const res = this.favoriteList.find(current => {
+        return current.id === song.id
+      })
+      return res !== undefined
+    }
+  },
+  computed: {
+    // 映射播放图标
+    ...mapGetters([
+      'isShowListPlayer',
+      'isPlayIcon',
+      'modeType',
+      // 所有歌曲
+      'songs',
+      //  当前歌曲索引
+      'currentIndex',
+      'currentSong',
+      'favoriteList'
+    ])
+  },
+  // 监听播放按钮的播放与暂停
+  watch: {
+    isPlayIcon (newVal, oldVal) {
+      if (newVal) {
+        this.$refs.playAndPause.classList.add('addOrRemove')
+      } else {
+        this.$refs.playAndPause.classList.remove('addOrRemove')
+      }
+    },
+    modeType (newVal, oldVal) {
+      if (newVal === modeType.loop) {
+        this.$refs.mode.classList.add('loop')
+        this.$refs.mode.classList.remove('random')
+      } else if (newVal === modeType.one) {
+        this.$refs.mode.classList.add('one')
+        this.$refs.mode.classList.remove('loop')
+      } else if (newVal === modeType.random) {
+        this.$refs.mode.classList.add('random')
+        this.$refs.mode.classList.remove('one')
+      }
+    },
+    isShowListPlayer (newVal, oldVal) {
+      if (newVal) {
+        this.$refs.scroll.refresh()
+      }
     }
   }
 }
@@ -83,7 +175,19 @@ export default {
           width: 56px;
           height: 56px;
           margin-right: 20px;
-          @include bg_img('../../../assets/images/small_loop')
+          //@include bg_img('../../../assets/images/small_loop');
+          &.loop{
+            @include bg_img('../../../assets/images/small_loop');
+
+          }
+          &.one{
+            @include bg_img('../../../assets/images/small_one');
+
+          }
+          &.random{
+            @include bg_img('../../../assets/images/small_shuffle');
+
+          }
         }
         p{
           @include font_color();
@@ -100,6 +204,18 @@ export default {
     }
     .player-middle{
       width: 100%;
+      height: 650px;
+      overflow: hidden;
+      .list{
+        &.addOrRemove{
+          .item{
+            .item-play{
+              @include bg_img('../../../assets/images/small_pause');
+
+            }
+          }
+        }
+      }
       .item{
         height: 100px;
         display: flex;
@@ -114,8 +230,9 @@ export default {
           .item-play{
             width: 56px;
             height: 56px;
-            @include  bg_img('../../../assets/images/small_play');
+            @include bg_img('../../../assets/images/small_play');
             margin-right: 20px;
+
           }
           p{
             @include font_size($font_medium_s);
@@ -128,7 +245,11 @@ export default {
           .item-favorite{
             width: 56px;
             height: 56px;
-            @include bg_img('../../../assets/images/small_favorite')
+            @include bg_img('../../../assets/images/small_un_favorite');
+            &.active{
+              @include bg_img('../../../assets/images/small_favorite');
+
+            }
           }
           .item-del{
             width: 56px;

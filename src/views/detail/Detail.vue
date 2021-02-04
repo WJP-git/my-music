@@ -74,6 +74,9 @@ export default {
     //     this.$refs.imgHeight.$el.style.filter = `blur(${scale}px)`
     //   }
     // })
+    setTimeout(() => {
+      this.$refs.scroll.refresh()
+    }, 100)
   }
 }
 </script>
@@ -94,7 +97,7 @@ export default {
     top: 500px;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 150px;
   }
 }
 </style>

@@ -1,14 +1,20 @@
 <template>
-  <div class="normal" v-show="this.isFullScreen">
-    <div class="player-wrapper">
-      <PlayerNavBar></PlayerNavBar>
-      <PlayerMiddle></PlayerMiddle>
-      <PlayerBottom></PlayerBottom>
+  <transition
+    @enter="enter"
+    @leave="leave"
+    :css="false"
+  >
+    <div class="normal" v-show="this.isFullScreen" ref="normal">
+      <div class="player-wrapper">
+        <PlayerNavBar/>
+        <PlayerMiddle :currentTime="currentTime"/>
+        <PlayerBottom :totalTime="totalTime" :currentTime="currentTime"/>
+      </div>
+      <div class="bg-img">
+        <img :src="currentSong.picUrl" alt="">
+      </div>
     </div>
-    <div class="bg-img">
-      <img src="https://aecpm.alicdn.com/simba/img/TB1CWf9KpXXXXbuXpXXSutbFXXX.jpg_q50.jpg" alt="">
-    </div>
-  </div>
+  </transition>
 </template>
 
 <script>
@@ -17,7 +23,11 @@ import PlayerNavBar from './PlayerNavBar'
 import PlayerMiddle from './PlayerMiddle'
 import PlayerBottom from './PlayerBottom'
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+
+// 动画
+import Velocity from 'velocity-animate'
+import 'velocity-animate/velocity.ui'
 export default {
   name: 'NormalPlayer',
   components: {
@@ -25,11 +35,48 @@ export default {
     PlayerMiddle,
     PlayerBottom
   },
+  props: {
+    totalTime: {
+      type: Number,
+      require: true
+    },
+    currentTime: {
+      type: Number,
+      require: true
+    }
+  },
   computed: {
     ...mapGetters([
-      'isFullScreen'
+      'isFullScreen',
+      // 歌曲信息
+      'currentSong'
     ])
+  },
+  methods: {
+    enter (el, done) {
+      Velocity(this.$refs.normal, 'transition.shrinkIn', { duration: 500 }, () => {
+        done()
+      })
+    },
+    leave (el, done) {
+      Velocity(this.$refs.normal, 'transition.shrinkOut', { duration: 500 }, () => {
+        done()
+      })
+    },
+    ...mapActions([
+      // 获取歌词信息
+      'getSongLyric'
+    ])
+  },
+  watch: {
+    currentSong (newVal, oldVal) {
+      if (newVal.id === undefined) {
+        return false
+      }
+      this.getSongLyric(newVal.id)
+    }
   }
+
 }
 </script>
 

@@ -3,64 +3,15 @@
   <swiper :options="swiperOption" class="banner">
     <!-- slides -->
     <swiper-slide class="item-one">
-      <div class="wrapper">
-                <img src="https://aecpm.alicdn.com/simba/img/TB1CWf9KpXXXXbuXpXXSutbFXXX.jpg_q50.jpg" alt="">
+      <div class="wrapper" ref="wrapper">
+        <img :src="currentSong.picUrl" alt="">
       </div>
-      <div>aaaaaaaa</div>
+      <div>{{ getFirstLyric() }}</div>
     </swiper-slide>
-    <swiper-slide class="item-two">
-      <Scroll>
+    <swiper-slide class="item-two" ref="lyric">
+      <Scroll ref="scroll">
         <ul>
-          <li>1</li>
-          <li>2</li>
-          <li>3</li>
-          <li>4</li>
-          <li>5</li>
-          <li>6</li>
-          <li>7</li>
-          <li>8</li>
-          <li>9</li>
-          <li>10</li>
-          <li>11</li>
-          <li>12</li>
-          <li>13</li>
-          <li>14</li>
-          <li>15</li>
-          <li>16</li>
-          <li>17</li>
-          <li>18</li>
-          <li>19</li>
-          <li>20</li>
-          <li>21</li>
-          <li>22</li>
-          <li>23</li>
-          <li>24</li>
-          <li>25</li>
-          <li>26</li>
-          <li>27</li>
-          <li>28</li>
-          <li>29</li>
-          <li>30</li>
-          <li>31</li>
-          <li>32</li>
-          <li>33</li>
-          <li>34</li>
-          <li>35</li>
-          <li>36</li>
-          <li>37</li>
-          <li>38</li>
-          <li>39</li>
-          <li>40</li>
-          <li>41</li>
-          <li>42</li>
-          <li>43</li>
-          <li>44</li>
-          <li>45</li>
-          <li>46</li>
-          <li>47</li>
-          <li>48</li>
-          <li>49</li>
-          <li>50</li>
+          <li v-for="(item,index) in currentLyric" :key="index" :class="{active:currentLineNum === index}">{{ item }}</li>
         </ul>
       </Scroll>
     </swiper-slide>
@@ -74,6 +25,8 @@ import 'swiper/dist/css/swiper.css'
 import { swiper, swiperSlide } from 'vue-awesome-swiper'
 
 import Scroll from '@/components/Scroll'
+
+import { mapGetters } from 'vuex'
 export default {
   name: 'PlayerMiddle',
   data () {
@@ -89,15 +42,61 @@ export default {
         observer: true,
         observeParents: true,
         observeSlideChildren: true
-      }
+      },
+      currentLineNum: '0'
     }
   },
-
+  props: {
+    currentTime: {
+      type: Number,
+      require: true
+    }
+  },
   components: {
     swiper,
     swiperSlide,
     Scroll
+  },
+  methods: {
+  //  获取第一句歌词
+    getFirstLyric () {
+      for (const key in this.currentLyric) {
+        return this.currentLyric[key]
+      }
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'isPlayIcon',
+      // 歌曲信息
+      'currentSong',
+      // 歌词
+      'currentLyric'
+    ])
+  },
+  watch: {
+    isPlayIcon (newVal, oldVal) {
+      if (newVal) {
+        this.$refs.wrapper.classList.add('active')
+      } else {
+        this.$refs.wrapper.classList.remove('active')
+      }
+    },
+    currentTime (newVal, oldVal) {
+      const lineNum = Math.floor(newVal) + ''
+      const res = this.currentLyric[lineNum]
+      if (res !== undefined && res !== '') {
+        this.currentLineNum = lineNum
+        //  歌词同步滚动
+        const currentLyricTop = document.querySelector('li.active').offsetTop
+        const lyricHeight = this.$refs.lyric.$el.offsetHeight
+        if (currentLyricTop > lyricHeight / 2) {
+          this.$refs.scroll.scrollTo(0, lyricHeight / 2 - currentLyricTop, 100)
+        }
+      }
+    }
   }
+
 }
 </script>
 
@@ -136,8 +135,16 @@ export default {
     border-radius: 50%;
     border: 30px solid #fff;
     overflow: hidden;
-    animation: sport 3s linear infinite;
+    animation: sport 7s linear infinite;
     animation-play-state: paused;
+    &.active{
+      animation-play-state: running;
+
+    }
+    img{
+      width: 100%;
+      height: 100%;
+    }
   }
 
   div {
@@ -152,6 +159,23 @@ export default {
     @include font_size($font_medium);
     @include font_color();
     margin: 10px 0;
+    li{
+      margin-bottom: 20px;
+      &:last-of-type{
+        padding-bottom: 100px;
+      }
+      &.active{
+        color: #fff;
+      }
+    }
+  }
+}
+@keyframes sport {
+  from{
+    transform: rotate(0deg);
+  }
+  to{
+    transform: rotate(360deg);
   }
 }
 </style>

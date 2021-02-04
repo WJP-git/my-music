@@ -10,6 +10,7 @@ const Rank = () => import('../views/rank/Rank')
 const Search = () => import('../views/search/Search')
 
 const Detail = () => import('../views/detail/Detail')
+const Account = () => import('../views/account/Account')
 
 Vue.use(VueRouter)
 
@@ -36,6 +37,10 @@ const routes = [
   {
     path: '/search',
     component: Search
+  },
+  {
+    path: '/account',
+    component: Account
   }
 
 ]

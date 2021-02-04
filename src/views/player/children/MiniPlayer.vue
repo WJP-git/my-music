@@ -2,14 +2,14 @@
   <div class="mini-player" v-show="isShowMiniPlayer">
     <div class="player-wrapper">
       <div class="player-left" @click="showNormal">
-        <img src="https://aecpm.alicdn.com/simba/img/TB1CWf9KpXXXXbuXpXXSutbFXXX.jpg_q50.jpg" alt="">
+        <img ref="miniImg" :src="currentSong.picUrl" alt="">
         <div class="player-title">
-          <h3>演员</h3>
-          <p>温济朋</p>
+          <h3>{{ currentSong.name }}</h3>
+          <p>{{ currentSong.singer }}</p>
         </div>
       </div>
       <div class="player-right">
-        <div class="play"></div>
+        <div class="play" ref="play" @click="playAndPause"></div>
         <div class="list" @click.stop="showListPlayer"></div>
       </div>
     </div>
@@ -21,22 +21,48 @@ import { mapActions, mapGetters } from 'vuex'
 export default {
   name: 'MiniPlayer',
   methods: {
+    // 显示播放列表
     showListPlayer () {
-      this.$emit('showListPlayer')
+      this.setListPlayer(true)
     },
     ...mapActions([
+      // 全屏播放界面
       'setFullScreen',
-      'setMiniPlayer'
+      // 迷你播放器
+      'setMiniPlayer',
+      // 显示播放列表
+      'setListPlayer',
+      // 播放与暂停
+      'setIsPlayIcon'
     ]),
+    // 全屏播放界面
     showNormal () {
       this.setFullScreen(true)
       this.setMiniPlayer(false)
+    },
+    // 播放图标 播放与暂停
+    playAndPause () {
+      this.setIsPlayIcon(!this.isPlayIcon)
     }
+
   },
   computed: {
     ...mapGetters([
-      'isShowMiniPlayer'
+      'isShowMiniPlayer',
+      'isPlayIcon',
+      'currentSong'
     ])
+  },
+  watch: {
+    isPlayIcon (newVal, oldVal) {
+      if (newVal) {
+        this.$refs.play.classList.add('active')
+        this.$refs.miniImg.classList.add('run')
+      } else {
+        this.$refs.play.classList.remove('active')
+        this.$refs.miniImg.classList.remove('run')
+      }
+    }
   }
 }
 </script>
@@ -67,6 +93,11 @@ export default {
         height: 100px;
         border-radius: 50%;
         margin-right: 20px;
+        animation: img 7s linear infinite;
+        animation-play-state: paused;
+        &.run{
+          animation-play-state: running;
+        }
       }
       .player-title{
         display: flex;
@@ -89,7 +120,10 @@ export default {
       .play{
         width: 84px;
         height: 84px;
-        @include bg_img('../../../assets/images/play')
+        @include bg_img('../../../assets/images/play');
+        &.active{
+          @include bg_img('../../../assets/images/pause');
+        }
       }
       .list{
         width: 120px;
@@ -97,6 +131,14 @@ export default {
         @include bg_img('../../../assets/images/list')
       }
     }
+  }
+}
+@keyframes img {
+  from{
+    transform: rotate(0deg);
+  }
+  to{
+    transform: rotate(360deg);
   }
 }
 </style>

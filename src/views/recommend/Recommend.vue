@@ -67,8 +67,26 @@ export default {
     //  新音乐
     async newSong () {
       const res = await getNewSong()
-      this.songs = res.result
+      const list = []
+      res.result.forEach(val => {
+        const obj = {}
+        obj.id = val.id
+        obj.name = val.name
+        obj.picUrl = val.song.album.picUrl
+        let singer = ''
+        for (let i = 0; i < val.song.artists.length; i++) {
+          if (i === 0) {
+            singer = val.song.artists[i].name
+          } else {
+            singer += '-' + val.song.artists[i].name
+          }
+        }
+        obj.singer = singer
+        list.push(obj)
+      })
+      this.songs = list
     },
+
     /**
      * 自定义方法
      * */
