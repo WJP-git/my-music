@@ -41,11 +41,11 @@ export default {
   },
   methods: {
     // 滚动距离
-    // scrolling (fn) {
-    //   this.iscroll.on('scroll', function () {
-    //     fn(this.y)
-    //   })
-    // }
+    scrolling (fn) {
+      this.iscroll.on('scroll', function () {
+        fn(this.y)
+      })
+    },
     refresh () {
       setTimeout(() => {
         this.iscroll.refresh()

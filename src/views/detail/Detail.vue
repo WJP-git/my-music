@@ -23,7 +23,7 @@ import Scroll from '@/components/Scroll'
  * 网络请求
  * */
 
-import { getPlaylist, getPlayAlbum } from '@/api'
+import { getPlaylist, getPlayAlbum, getArtistsSongs } from '@/api'
 
 export default {
   name: 'Detail',
@@ -36,8 +36,10 @@ export default {
   created () {
     if (this.$route.params.type === 'person') {
       this.playList({ id: this.$route.params.id })
-    } else {
+    } else if (this.$route.params.type === 'albums') {
       this.playAlbum({ id: this.$route.params.id })
+    } else if (this.$route.params.type === 'singer') {
+      this.artistsSongs({ id: this.$route.params.id })
     }
   },
   data () {
@@ -59,6 +61,14 @@ export default {
         name: res.album.name,
         coverImgUrl: res.album.picUrl,
         tracks: res.songs
+      }
+    },
+    async artistsSongs (id) {
+      const res = await getArtistsSongs(id)
+      this.playlist = {
+        name: res.artist.name,
+        coverImgUrl: res.artist.picUrl,
+        tracks: res.hotSongs
       }
     }
   },
